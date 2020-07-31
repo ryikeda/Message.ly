@@ -17,6 +17,22 @@ const { ensureLoggedIn } = require("../middleware/auth");
  * Make sure that the currently-logged-in users is either the to or from user.
  *
  **/
+router.get("/:id", ensureLoggedIn, async (req, res, next) => {
+  try {
+    let username = req.user.username;
+    let msg = await Message.get(req.params.id);
+
+    if (
+      msg.to_user.username !== username &&
+      msg.from_user.username !== username
+    ) {
+      throw new ExpressError("Cannot read this message", 401);
+    }
+    return res.json({ message: msg });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /** POST / - post message.
  *
