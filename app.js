@@ -30,7 +30,7 @@ app.get("/", (req, res, next) => {
   }
 });
 
-// app.use("/auth", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 // app.use("/messages", messageRoutes);
 
