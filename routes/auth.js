@@ -6,12 +6,28 @@ const { SECRET_KEY } = require("../config");
 const ExpressError = require("../expressError");
 
 const jwt = require("jsonwebtoken");
+const { use } = require("../app");
 
 /** POST /login - login: {username, password} => {token}
  *
  * Make sure to update their last-login!
  *
  **/
+
+router.post("/login", async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    if (await User.authenticate(username, password)) {
+      let token = jwt.sign({ username }, SECRET_KEY);
+      User.updateLoginTimestamp(username);
+      return res.json({ token });
+    } else {
+      throw new ExpressError("Invalid credentials", 400);
+    }
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /** POST /register - register user: registers, logs in, and returns token.
  *
