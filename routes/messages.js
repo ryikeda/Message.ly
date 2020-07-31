@@ -62,4 +62,18 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
  *
  **/
 
+router.post("/:id/read", ensureLoggedIn, async (req, res, next) => {
+  try {
+    const username = req.user.username;
+    const msg = await Message.get(req.params.id);
+    if (msg.to_user.username !== username) {
+      throw new ExpressError("Cannot set this message to read", 401);
+    }
+    const readMsg = await Message.markRead(req.params.id);
+    return res.json({ readMsg });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 module.exports = router;
